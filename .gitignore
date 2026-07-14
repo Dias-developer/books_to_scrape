@@ -1,0 +1,22 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# PyCharm
+.idea/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Временные файлы
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
