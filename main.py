@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import csv
 
-
+print('Start')
 headers = {
     'User-Agent': UserAgent().random,
 }
@@ -38,3 +38,4 @@ with open('stuff.csv', 'w', newline='', encoding='utf-8') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=['title', 'price', 'rating', 'link'], delimiter=";")
     writer.writeheader()
     writer.writerows(books)
+print('Finished!')
