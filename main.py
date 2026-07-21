@@ -1,19 +1,42 @@
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import csv
+import time
 
-def parsing():
-    print('Start')
-    headers = {
+headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                       "AppleWebKit/537.36 (KHTML, like Gecko) "
                       "Chrome/120.0 Safari/537.36",
         "Accept-Language": "ru-RU,ru;q=0.9",
     }
+start = time.perf_counter()
+def make_session():
+    session = requests.Session()
+    session.headers.update(headers)
+
+    retry = Retry(
+        total=5,
+        backoff_factor=1,  # 1s, 2s, 4s, 8s...
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+        respect_retry_after_header=True,
+    )
+
+    session.mount('https://', HTTPAdapter(max_retries=retry))
+    session.mount('http://', HTTPAdapter(max_retries=retry))
+
+    return session
+
+
+def parsing():
+    print('Start')
+    session = make_session()
     books = []
     page = 1
     while True:
-        response = requests.get(f"https://books.toscrape.com/catalogue/page-{page}.html", headers=headers, timeout=(3, 6))
+        response = session.get(f"https://books.toscrape.com/catalogue/page-{page}.html", timeout=(3, 6))
 
         if response.status_code == 404:
             break
@@ -43,5 +66,6 @@ def parsing():
         writer.writeheader()
         writer.writerows(books)
     print('Finished!')
-
 parsing()
+end = time.perf_counter()
+print(f'{end - start:.2f} seconds')
